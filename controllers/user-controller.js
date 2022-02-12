@@ -39,6 +39,7 @@ const userController = {
     res.redirect('/signin')
   },
   getUser: (req, res, next) => {
+    const currentUser = getUser(req)
     return User.findByPk(req.params.id, {
       include: [
         { model: Comment, include: Restaurant }
@@ -50,7 +51,7 @@ const userController = {
         const Comments = targetUser.Comments || []
         // 過濾使用者評論過重複的餐廳
         const commentRest = unduplicatedRest(Comments)
-        return res.render('users/profile', { user: user.toJSON(), commentRest })
+        return res.render('users/profile', { user: targetUser, currentUser, commentRest })
       })
       .catch(err => next(err))
   },

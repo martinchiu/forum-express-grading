@@ -9,9 +9,11 @@
     <h3>{{ user.name }}</h3>
     <p>{{ user.email }}</p>
     <p style="font-weight: lighter">Joined since {{formatTime user.createdAt}}</p>
+    {{#ifCond currentUser.id user.id }}
     <form action="/users/{{ user.id }}/edit" method="get">
       <button type="submit" class="btn btn-primary">Edit</button>
     </form>
+    {{/ifCond}}
   </div>
 </div>
 <div class="comment">
