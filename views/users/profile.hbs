@@ -2,12 +2,18 @@
   <div class="avatar bg-light" style="border-radius: 100%;height: 400px;width: 400px">
     <img
       src="{{#if user.image }}{{ user.image }}{{else}}https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png{{/if}}"
-      alt="avatar"
-      style="height: 400px; width: 400px">
+      alt="avatar" style="height: 400px; width: 400px">
   </div>
   <div class="content" style="margin: 50px;">
     <h3>{{ user.name }}</h3>
     <p>{{ user.email }}</p>
+    <br>
+    <ul style="list-style-type: none; padding-left: 0">
+    <li><strong>{{ user.Followers.length }}</strong> 追蹤我的人(follower)</li>
+      <li><strong>{{ user.Followings.length }}</strong> 追蹤者(following)</li>
+      <li><strong>{{ comments.length }}</strong> 已評論餐廳</li>
+      <li><strong>{{ user.FavoritedRestaurants.length }}</strong> 收藏的餐廳</li>
+    </ul>
     <p style="font-weight: lighter">Joined since {{formatTime user.createdAt}}</p>
     {{#ifCond currentUser.id user.id }}
     <form action="/users/{{ user.id }}/edit" method="get">
@@ -16,22 +22,81 @@
     {{/ifCond}}
   </div>
 </div>
-<div class="comment">
-  <div class="card">
-    <div class="card-header">
-      {{ comments.length }} 已評論餐廳
+<div class="social d-flex justify-content-evenly">
+  <div class="followship" style="width: 35%;">
+    {{!-- follower --}}
+    <div class="card">
+      <div class="card-header">
+        <strong>{{ user.Followers.length }}</strong> 追蹤我的人(follower)
+      </div>
+      <div class="card-body">
+        <blockquote class="blockquote mb-0">
+          <div class="photo">
+            {{#each user.Followers}}
+            <a href="/users/{{ this.id }}" style="text-decoration: none">
+              <img src="{{ this.image }}" alt="restaurant_photo"
+                style="width: 80px; height: 60px">
+            </a>
+            {{/each}}
+          </div>
+        </blockquote>
+      </div>
     </div>
-    <div class="card-body">
-      <blockquote class="blockquote mb-0">
-        <div class="photo">
-          {{#each comments}}
-          <a href="/restaurants/{{ this.Restaurant.id }}" style="text-decoration: none">
-            <img src="{{ this.Restaurant.image }}" alt="restaurant_photo" style="width: 60px; height: 40px; border-radius: 25%;">
-          </a>
-          {{/each}}
-        </div>
-        <footer class="blockquote-footer mt-3">已發表評論數： {{ user.Comments.length }}</footer>
-      </blockquote>
+    {{!-- following --}}
+    <div class="card mt-3">
+      <div class="card-header">
+        <strong>{{ user.Followings.length }}</strong> 追蹤者(following)
+      </div>
+      <div class="card-body">
+        <blockquote class="blockquote mb-0">
+          <div class="photo">
+            {{#each user.Followings}}
+            <a href="/users/{{ this.id }}" style="text-decoration: none">
+              <img src="{{ this.image }}" alt="restaurant_photo" style="width: 80px; height: 60px">
+            </a>
+            {{/each}}
+          </div>
+        </blockquote>
+      </div>
+    </div>
+  </div> 
+  <div class="restaurant" style="width: 60%;">
+    {{!-- comment --}}
+    <div class="card">
+      <div class="card-header">
+        <strong>{{ comments.length }}</strong> 已評論餐廳
+      </div>
+      <div class="card-body">
+        <blockquote class="blockquote mb-0">
+          <div class="photo">
+            {{#each comments}}
+            <a href="/restaurants/{{ this.Restaurant.id }}" style="text-decoration: none">
+              <img src="{{ this.Restaurant.image }}" alt="restaurant_photo"
+                style="width: 60px; height: 40px; border-radius: 25%;">
+            </a>
+            {{/each}}
+          </div>
+          <footer class="blockquote-footer mt-3">已發表評論數： {{ user.Comments.length }}</footer>
+        </blockquote>
+      </div>
+    </div>
+    {{!-- favorite --}}
+    <div class="card mt-3">
+      <div class="card-header">
+        <strong>{{ user.FavoritedRestaurants.length }}</strong> 收藏的餐廳
+      </div>
+      <div class="card-body">
+        <blockquote class="blockquote mb-0">
+          <div class="photo">
+            {{#each user.FavoritedRestaurants}}
+            <a href="/restaurants/{{ this.id }}" style="text-decoration: none">
+              <img src="{{ this.image }}" alt="restaurant_photo"
+                style="width: 60px; height: 40px; border-radius: 25%;">
+            </a>
+            {{/each}}
+          </div>
+        </blockquote>
+      </div>
     </div>
   </div>
 </div>

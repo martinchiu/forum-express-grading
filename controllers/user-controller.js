@@ -41,7 +41,15 @@ const userController = {
   getUser: (req, res, next) => {
     const currentUser = getUser(req)
     return Promise.all([
-      User.findByPk(req.params.id, { include: [Comment] }),
+      User.findByPk(req.params.id,
+        {
+          include: [
+            Comment,
+            { model: User, as: 'Followers' },
+            { model: User, as: 'Followings' },
+            { model: Restaurant, as: 'FavoritedRestaurants' }
+          ]
+        }),
       Comment.findAll({
         where: { userId: req.params.id },
         include: [Restaurant],
@@ -51,6 +59,7 @@ const userController = {
       })
     ])
       .then(([user, comments]) => {
+        console.log(user.toJSON())
         if (!user) throw new Error("User didn't exist!")
         return res.render('users/profile', { user: user.toJSON(), currentUser, comments })
       })
@@ -175,6 +184,8 @@ const userController = {
   },
   addFollowing: (req, res, next) => {
     const { userId } = req.params
+    const currentUser = getUser(req)
+    if (Number(userId) === currentUser.id) throw new Error('User is forbidden following yourself!')
     Promise.all([
       User.findByPk(userId),
       Followship.findOne({
