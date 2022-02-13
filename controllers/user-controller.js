@@ -1,8 +1,8 @@
 const bcrypt = require('bcryptjs')
+const Sequelize = require('sequelize')
 const { User, Comment, Restaurant, Favorite, Like, Followship } = require('../models')
 const { imgurFileHandler } = require('../helpers/file-helpers')
 const { getUser } = require('../helpers/auth-helpers')
-const { unduplicatedRest } = require('../helpers/unduplicated')
 const userController = {
   signUpPage: (req, res) => {
     res.render('signup')
@@ -40,18 +40,19 @@ const userController = {
   },
   getUser: (req, res, next) => {
     const currentUser = getUser(req)
-    return User.findByPk(req.params.id, {
-      include: [
-        { model: Comment, include: Restaurant }
-      ]
-    })
-      .then(user => {
+    return Promise.all([
+      User.findByPk(req.params.id, { include: [Comment] }),
+      Comment.findAll({
+        where: { userId: req.params.id },
+        include: [Restaurant],
+        raw: true,
+        nest: true,
+        attributes: [[Sequelize.fn('DISTINCT', Sequelize.col('restaurant_id')), 'unduplicatedRestId']] // 過濾使用者評論過重複的餐廳
+      })
+    ])
+      .then(([user, comments]) => {
         if (!user) throw new Error("User didn't exist!")
-        const targetUser = user.toJSON()
-        const Comments = targetUser.Comments || []
-        // 過濾使用者評論過重複的餐廳
-        const commentRest = unduplicatedRest(Comments)
-        return res.render('users/profile', { user: targetUser, currentUser, commentRest })
+        return res.render('users/profile', { user: user.toJSON(), currentUser, comments })
       })
       .catch(err => next(err))
   },

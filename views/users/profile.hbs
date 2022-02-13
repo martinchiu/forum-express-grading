@@ -19,12 +19,12 @@
 <div class="comment">
   <div class="card">
     <div class="card-header">
-      {{ commentRest.length }} 已評論餐廳
+      {{ comments.length }} 已評論餐廳
     </div>
     <div class="card-body">
       <blockquote class="blockquote mb-0">
         <div class="photo">
-          {{#each commentRest}}
+          {{#each comments}}
           <a href="/restaurants/{{ this.Restaurant.id }}" style="text-decoration: none">
             <img src="{{ this.Restaurant.image }}" alt="restaurant_photo" style="width: 60px; height: 40px; border-radius: 25%;">
           </a>
