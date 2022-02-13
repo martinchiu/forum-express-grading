@@ -95,14 +95,14 @@ const userController = {
       const restaurant = await Restaurant.findByPk(restaurantId)
       if (!restaurant) throw new Error("Restaurant didn't exist!")
 
-      const like = await Like.findOne({
+      const fav = await Favorite.findOne({
         where: {
           userId: req.user.id,
           restaurantId
         }
       })
-      if (like) throw new Error('You have liked this restaurant!')
-      await Like.create({
+      if (fav) throw new Error('You have liked this restaurant!')
+      await Favorite.create({
         userId: req.user.id,
         restaurantId
       })
