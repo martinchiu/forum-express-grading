@@ -1,4 +1,4 @@
-const { Category } = require('../models')
+const { Category, Restaurant } = require('../models')
 const categoryController = {
   getCategories: (req, res, next) => {
     return Promise.all([
@@ -37,14 +37,19 @@ const categoryController = {
       })
       .catch(err => next(err))
   },
-  deleteCategory: (req, res, next) => {
-    return Category.findByPk(req.params.id)
-      .then(category => {
-        if (!category) throw new Error("Category didn't exist!")
-        return category.destroy()
-      })
-      .then(() => res.redirect('/admin/categories'))
-      .catch(err => next(err))
+  deleteCategory: async (req, res, next) => {
+    try {
+      const category = await Category.findByPk(req.params.id, { include: [Restaurant] })
+      if (!category) throw new Error("Category didn't exist!")
+      if (category.dataValues.name === '未分類') throw new Error('未分類不能被刪除!')
+
+      if (category.Restaurants.length) {
+        const uncategorized = await Category.findOrCreate({ where: { name: '未分類' }, raw: true, nest: true })
+        await Restaurant.update({ categoryId: uncategorized[0].id }, { where: { categoryId: req.params.id }, raw: true, nest: true })
+      }
+      await category.destroy()
+      return res.redirect('/admin/categories')
+    } catch (err) { next(err) }
   }
 }
 module.exports = categoryController
