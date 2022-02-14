@@ -12,7 +12,7 @@
     <li><strong>{{ user.Followers.length }}</strong> 追蹤我的人(follower)</li>
       <li><strong>{{ user.Followings.length }}</strong> 追蹤者(following)</li>
       <li><strong>{{ comments.length }}</strong> 已評論餐廳</li>
-      <li><strong>{{ user.FavoritedRestaurants.length }}</strong> 收藏的餐廳</li>
+      <li><strong>{{ fav.length }}</strong> 收藏的餐廳</li>
     </ul>
     <p style="font-weight: lighter">Joined since {{formatTime user.createdAt}}</p>
     {{#ifCond currentUser.id user.id }}
@@ -83,14 +83,14 @@
     {{!-- favorite --}}
     <div class="card mt-3">
       <div class="card-header">
-        <strong>{{ user.FavoritedRestaurants.length }}</strong> 收藏的餐廳
+        <strong>{{ fav.length }}</strong> 收藏的餐廳
       </div>
       <div class="card-body">
         <blockquote class="blockquote mb-0">
           <div class="photo">
-            {{#each user.FavoritedRestaurants}}
-            <a href="/restaurants/{{ this.id }}" style="text-decoration: none">
-              <img src="{{ this.image }}" alt="restaurant_photo"
+            {{#each fav}}
+            <a href="/restaurants/{{ this.Restaurant.id }}" style="text-decoration: none">
+              <img src="{{ this.Restaurant.image }}" alt="restaurant_photo"
                 style="width: 60px; height: 40px; border-radius: 25%;">
             </a>
             {{/each}}

@@ -46,8 +46,7 @@ const userController = {
           include: [
             Comment,
             { model: User, as: 'Followers' },
-            { model: User, as: 'Followings' },
-            { model: Restaurant, as: 'FavoritedRestaurants' }
+            { model: User, as: 'Followings' }
           ]
         }),
       Comment.findAll({
@@ -56,12 +55,17 @@ const userController = {
         raw: true,
         nest: true,
         attributes: [[Sequelize.fn('DISTINCT', Sequelize.col('restaurant_id')), 'unduplicatedRestId']] // 過濾使用者評論過重複的餐廳
+      }),
+      Favorite.findAll({
+        raw: true,
+        nest: true,
+        where: { userId: req.params.id },
+        include: [Restaurant]
       })
     ])
-      .then(([user, comments]) => {
-        console.log(user.toJSON())
+      .then(([user, comments, fav]) => {
         if (!user) throw new Error("User didn't exist!")
-        return res.render('users/profile', { user: user.toJSON(), currentUser, comments })
+        return res.render('users/profile', { user: user.toJSON(), currentUser, comments, fav })
       })
       .catch(err => next(err))
   },
